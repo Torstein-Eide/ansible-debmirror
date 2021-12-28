@@ -1,0 +1,150 @@
+---
+- hosts: debmirror
+  roles:
+    - ansible-deb-mirror
+  vars:
+    debmirror_mirror_path: /volume1/debmirror
+    debmirror_mount: volume1.mount
+    debmirror_config:
+      debian:
+        remote_host: ftp.acc.umu.se
+        remote_root: /mirror/debian
+        i18n: true
+        max_batch: 200
+        state_cache_days: 14
+        post_cleanup: true
+        timeout: 300
+        download_method: http
+        diff_mode: use  # use|mirror|none
+        architectures:
+          - amd64
+          - arm64
+          - armhf
+        release:
+          - bullseye
+          - bullseye-backports
+          - bullseye-updates
+        sections:
+          - main
+          - non-free
+          - contrib
+        excludes:
+          - '/Translation-.*'
+          - '/Translation-en.gz'
+          - '/language-pack-.*'
+          - '(thunderbird|firefox)-locale-.*'
+          - '/libreoffice-l10n.*'
+          - '/manpages-(\w{2}|\w{2}-extra|\w{2}-dev|\w{2}-extra-dev)_.*'
+          - '/myspell-(\w{2}|\w{2}-\w{2,3}|)[-_].*'
+          - '/unidic-mecab.*'
+          - '/libreoffice-dev-doc.*'
+          - '/thunderbird-dbg.*'
+          - '/firefox-dbg.*'
+          - '/texlive-fonts-extra.*'
+        includes:
+          - '/myspell-(nb|nn).*'
+          - '/libreoffice-l10n-(nb|nn).*'
+          - '(thunderbird|firefox)-locale-(nb|nn).*'
+          - '/language-pack-?(gnome|kde)-(no|en).*'
+          - '/Translation-(no|en\.|en_GB|en_US).*'
+      ubuntu:
+        remote_host: ftp.acc.umu.se
+        remote_root: /mirror/ubuntu
+        i18n: true
+        max_batch: 200
+        state_cache_days: 14
+        post_cleanup: true
+        timeout: 300
+        download_method: http
+        diff_mode: use  # use|mirror|none
+        architectures:
+          - amd64
+          - i386
+        release:
+          - focal
+          - focal-security
+          - focal-updates
+          - focal-backports
+          - jammy
+          - jammy-backports
+          - jammy-security
+          - jammy-updates
+        sections:
+          - main
+          - restricted
+          - universe
+          - multiverse
+        excludes:
+          - '/Translation-.*'
+          - '/Translation-en.gz'
+          - '/language-pack-.*'
+          - '(thunderbird|firefox)-locale-.*'
+          - '/libreoffice-l10n.*'
+          - '/manpages-(\w{2}|\w{2}-extra|\w{2}-dev|\w{2}-extra-dev)_.*'
+          - '/myspell-(\w{2}|\w{2}-\w{2,3}|)[-_].*'
+          - '/unidic-mecab.*'
+          - '/libreoffice-dev-doc.*'
+          - '/thunderbird-dbg.*'
+          - '/firefox-dbg.*'
+          - '/texlive-fonts-extra.*'
+        includes:
+          - '/myspell-(nb|nn).*'
+          - '/libreoffice-l10n-(nb|nn).*'
+          - '(thunderbird|firefox)-locale-(nb|nn).*'
+          - '/language-pack-?(gnome|kde)-(no|en).*'
+          - '/Translation-(no|en\.|en_GB|en_US).*'
+      raspbian:
+        remote_host: ftp.acc.umu.se
+        remote_root: /mirror/raspbian/raspbian
+        download_method: http
+        release:
+          - buster
+          - bullseye
+        sections:
+          - contrib
+          - firmware
+          - main
+          - non-free
+          - rpi
+        architectures:
+          - armhf
+        ignores:
+        excludes:
+          - '/Translation-.*'
+          - '/language-pack-.*'
+          - '(thunderbird|firefox)-locale-.*'
+          - '/libreoffice-l10n.*'
+          - '/manpages-(\w{2}|\w{2}-extra|\w{2}-dev|\w{2}-extra-dev)_.*'
+          - '/myspell-(\w{2}|\w{2}-\w{2,3}|)[-_].*'
+          - '/unidic-mecab.*'
+          - '/libreoffice-dev-doc.*'
+          - '/thunderbird-dbg.*'
+          - '/firefox-dbg.*'
+          - '/texlive-fonts-extra.*'
+        includes:
+          - '/myspell-(nb|nn).*'
+          - '/libreoffice-l10n-(nb|nn).*'
+          - '(thunderbird|firefox)-locale-(nb|nn).*'
+          - '/language-pack-?(gnome|kde)-(no|en).*'
+          - '/Translation-(no|en).*'
+        excludes_deb_section:
+          - 'games'
+          - 'news'
+          - 'science'
+          - 'xfce'
+          - 'mail'
+          - 'hamradio'
+          - 'haskell'
+          - 'education'
+          - 'devel'
+        i18n: true
+        max_batch: 200
+        state_cache_days: 14
+        post_cleanup: true
+        timeout: 300
+        diff_mode: use  # use|mirror|none
+
+
+
+
+    ## export ANSIBLE_BECOME_PASS='<your password>'

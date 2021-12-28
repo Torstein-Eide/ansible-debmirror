@@ -1,0 +1,25 @@
+galaxy_info:
+  author: Torstein Eide
+  description: role to manage debmirror
+  company: personal
+  role_name: debmirror
+
+  license: BSD
+  min_ansible_version: "2.1"
+
+  # If this a Container Enabled role, provide the minimum Ansible Container version.
+  # min_ansible_container_version:
+
+  #
+  # Provide a list of supported platforms, and for each platform a list of versions.
+  # If you don't wish to enumerate all versions for a particular platform, use 'all'.
+  # To view available platforms and versions (or releases), visit:
+  # https://galaxy.ansible.com/api/v1/platforms/
+  #
+  platforms:
+    - name: Debian
+    - name: Ubuntu
+
+  galaxy_tags: []
+
+dependencies: []

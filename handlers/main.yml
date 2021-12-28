@@ -1,0 +1,20 @@
+---
+# handlers file for ansible-deb-mirror
+
+- name: "systemd deamon reload"
+  systemd:
+    daemon_reload: yes
+  become: true
+
+- name: debmirror restarted
+  become: true
+  systemd:
+    name: debmirror.timer
+    state: restarted
+
+- name: enable service debmirror and ensure it is not masked
+  systemd:
+    name: debmirror.timer
+    enabled: yes
+    masked: no
+  become: true

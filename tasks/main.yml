@@ -1,0 +1,143 @@
+---
+# tasks file for ansible-deb-mirror
+
+- name: Ensure group  "{{ debmirror_group }}" exists
+  group:
+    name:  "{{ debmirror_group }}"
+    state: present
+  become: true
+  tags:
+    - setup
+
+- name: Make debmirror user
+  user:
+    name: "{{ debmirror_user }}"
+    shell: "/usr/sbin/nologin"
+    groups: "{{ debmirror_group }}"
+    append: yes
+    home: "{{ debmirror_mirror_path }}"
+    create_home: yes
+    comment: "user for running debmirror"
+  when: not debmirror_user == "root"
+  become: true
+  tags:
+    - setup
+
+- name: "Ensure {{ debmirror_packages }} are installed"
+  become: true
+  package:
+   name: "{{ debmirror_packages }}"
+   state: present
+
+
+  tags:
+    - setup
+
+
+- name: Ensure debmirror config directory exists
+  become: true
+  file:
+    path: "{{ debmirror_config_path }}"
+    state: directory
+    mode: 0755
+  tags:
+    - setup
+
+- name: "debmirror work directory {{ debmirror_mirror_path }}"
+  ansible.builtin.file:
+    path: "{{ debmirror_mirror_path }}"
+    state: directory
+    owner: "{{ debmirror_user }}"
+    group: "{{ debmirror_group }}"
+    mode: "{{ 0755 }}"
+    recurse: yes
+  become: true
+  tags:
+    - setup
+
+- name: Ensure "{{ debmirror_config_path }}/trusted.gpg.d/" directory exists
+  become: true
+  file:
+    path: "{{ debmirror_config_path }}/trusted.gpg.d/"
+    state: directory
+    mode: 0755 
+  tags:
+    - setup
+
+- name: copy "apt keys"
+  become: true
+  copy:
+   mode: 0644
+   src: "{{ item }}"
+   dest: "{{ debmirror_config_path }}/trusted.gpg.d/"
+#   checksum: yes
+  with_fileglob:
+   - "{{ debmirror_apt_keys }}"
+  register: aptkey
+  tags:
+    - setup
+    - configuration
+
+- name: import keys to trustedkeys.kbx
+  become: true
+  shell: /usr/bin/gpg --no-default-keyring --keyring {{ debmirror_config_path }}/{{ debmirror_keyring }} --import {{ item }}
+  when: aptkey.changed
+  with_fileglob:
+    - "{{ debmirror_config_path }}/trusted.gpg.d/*"
+  tags:
+    - setup
+    - configuration
+
+
+- name: Dynamically generate deb-mirror config files
+  become: true
+  template:
+    src: "{{ item.value.template_file | default('debmirror.conf.j2') }}"
+    dest: "{{ debmirror_config_path }}/{{ item.value }}.conf"
+    # backup: true
+    mode: 0644
+  with_dict: "{{ debmirror_config }}"
+  tags:
+    - setup
+    - configuration 
+
+
+
+- name: Dynamically generate deb-mirror shell files
+  become: true
+  template:
+   src: "{{ item.value.template_file | default('debmirror.sh.j2') }}"
+   dest: "{{ debmirror_config_path }}/debmirror.sh"
+   #backup: true
+   mode: 0755
+  register: template_sh
+  tags:
+    - setup
+    - configuration
+  
+
+- name: Systemd service
+  template:
+    src: debmirror.service.j2
+    dest: "/lib/systemd/system/debmirror.service"
+    mode: 0644
+  become: true
+  notify:
+    - systemd deamon reload
+  tags:
+    - setup
+    - configuration
+
+- name: Systemd timer service
+  template:
+    src: debmirror.timer.j2
+    dest: "/lib/systemd/system/debmirror.timer"
+    mode: 0644
+  become: true
+  notify:
+    - systemd deamon reload
+    - debmirror restarted
+  tags:
+    - setup
+    - configuration
+

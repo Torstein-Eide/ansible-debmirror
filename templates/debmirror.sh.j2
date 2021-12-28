@@ -1,0 +1,27 @@
+#!/bin/bash
+## {{ ansible_managed }}
+
+export GNUPGHOME={{ debmirror_config_path }}
+
+echo "### Start script ###"
+{% for item in debmirror_config %}
+echo "# Runing for {{item}}"
+debmirror --config-file={{ debmirror_config_path }}/{{ debmirror_config[item] }}.conf
+RCinst=$?
+echo "# Finish for {{item}}, rc: $RCinst"
+RC+=($RCinst)
+{% endfor %}
+echo "### End script ###"
+
+max_RC=0
+for v in ${RC[@]}; do
+    if (( $v > $max_RC )); then max_RC=$v; fi; 
+done
+
+if [ ${max_RC} -eq 0 ]; then
+    echo "# Finished successfully"
+else
+    echo "# Exited with errors rc: ${max_RC}"
+fi
+
+exit ${max_RC}

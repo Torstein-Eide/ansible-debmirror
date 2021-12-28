@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Debmirror(downloads and maintains a local Debian mirror)
+
+[Timer]
+OnCalendar={{ debmirror_clock }}
+
+[Install]
+WantedBy=timers.target

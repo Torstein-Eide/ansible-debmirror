@@ -1,0 +1,19 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Debmirror (downloads and maintains a local Debian mirror)
+After=syslog.target
+After=network.target
+{% if debmirror_mount is defined and debmirror_mount != ""  %}
+Requires={{debmirror_mount}}
+{% endif %}
+
+[Service]
+Type=oneshot
+User={{ debmirror_user }}
+Group={{ debmirror_group }}
+WorkingDirectory={{ debmirror_mirror_path }}
+ExecStart={{ debmirror_config_path }}/debmirror.sh
+Nice={{debmirror_nice_lvl}}
+
+

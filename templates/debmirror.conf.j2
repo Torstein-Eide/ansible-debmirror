@@ -1,0 +1,92 @@
+# {{ ansible_managed | comment }}
+
+{% if item.value.mirrordir is defined and item.value.mirrordir %}
+$mirrordir="{{ item.value.mirrordir }}";{% else %}
+$mirrordir="{{ debmirror_mirror_path }}/{{  item.key }}";{% endif %}
+
+{% if item.value.verbose is defined and item.value.verbose == true  %}
+$verbose=1;  {% else %}  $verbose=0; {% endif %}
+{% if item.value.progress is defined and item.value.progress == true   %}
+$progress=1; {% else %}  $progress=0; {% endif %}
+{% if item.value.debug   is defined and item.value.debug == true   %}
+$debug=1;    {% else %}  $debug=0; {% endif %}
+{% if item.value.dry_run is defined and item.value.dry_run == true   %}
+$dry_run=1;   {% else %}  $dry_run=0;   {% endif %}
+{% if debmirror_slow_cpu is defined and debmirror_slow_cpu == true   %}
+$slow_cpu=1; {% else %}  $slow_cpu=0;   {% endif %}
+
+{% if item.value.user is defined and item.value.user %}
+$user="{{ item.value.user | default('anonymous') }}";{% endif %}
+{% if item.value.passwd is defined and item.value.passwd %}
+$passwd="{{ item.value.passwd | default('anonymous@') }}";{% endif %}
+
+$host="{{ item.value.remote_host }}";
+$remoteroot="{{ item.value.remote_root }}";
+$download_method="{{ item.value.download_method | default('http') }}";
+
+{% if item.value.release is defined and item.value.release   %}@dists=({% for release in item.value.release %} '{{release}}',{% endfor %}); {% endif %}
+{% if item.value.sections is defined and item.value.sections %}@sections=({% for sections in item.value.sections %} '{{sections}}',{% endfor %}); {% endif %}
+{% if item.value.architectures is defined and item.value.architectures %}@arches=({% for arches in item.value.architectures  %} '{{arches}}',{% endfor %}); {% endif %}
+{% if item.value.ignores is defined and item.value.ignores   %}@ignores=({% for ignores in item.value.ignores %} '{{ignores}}',{% endfor %}); {% endif %}
+{% if item.value.excludes is defined and item.value.excludes %}@excludes=({% for excludes in item.value.excludes %} '{{excludes}}',{% endfor %}); {% endif %}
+{% if item.value.includes is defined and item.value.includes %}@includes=({% for includes in item.value.includes %} '{{includes}}',{% endfor %}); {% endif %}
+{% if item.value.excludes_deb_section is defined and item.value.excludes_deb_section %}@excludes_deb_section=({% for excludes_deb_section in item.value.excludes_deb_section %} '{{excludes_deb_section}}',{% endfor %}); {% endif %}
+{% if item.value.limit_priority is defined and item.value.limit_priority %}@limit_priority=({% for limit_priority in item.value.limit_priority %} '{{limit_priority}}',{% endfor %}); {% endif %}
+
+{% if item.value.omit_suite_symlinks is defined and item.value.omit_suite_symlinks == true %} 
+$omit_suite_symlinks=1;{% endif %}
+{% if item.value.skippackages is defined and item.value.skippackages == true %}
+$skippackages=1; {% endif %}
+{% if item.value.i18n is defined and item.value.i18n == true %}
+$i18n=1; {% else %}  $i18n=0; {% endif %}
+{% if item.value.getcontents is defined and item.value.getcontents == true %}
+$getcontents=1; {% endif %}
+{% if item.value.do_source is defined and item.value.do_source == false %}
+$do_source=0; {% else %} $do_source=1; {% endif %}
+{% if item.value.max_batch is defined and item.value.max_batch == true %}
+$max_batch=1; {% endif %}
+
+{% if item.value.rsync_extra is defined and item.value.rsync_extra %}@rsync_extra=({% for rsync_extra in item.value.rsync_extra %} '{{rsync_extra}}',{% endfor %});
+{% endif %}
+{% if item.value.di_dists is defined and item.value.di_dists %}@di_dists=({% for di_dists in item.value.di_dists %} '{{di_dists}}',{% endfor %});
+{% endif %}
+{% if item.value.di_archs is defined and item.value.di_archs %}@di_archs=({% for di_archs in item.value.di_archs %} '{{di_archs}}',{% endfor %});
+{% endif %}
+
+$state_cache_days={{ item.value.state_cache_days | default('0') }};
+
+{% if item.value.ignore_release_gpg      is defined and item.value.ignore_release_gpg == true   %}
+$ignore_release_gpg=1;{% endif %}
+{% if item.value.ignore_release      is defined and item.value.ignore_release == true   %}
+$ignore_release=1;{% endif %}
+{% if item.value.check_md5sums      is defined and item.value.check_md5sums == true   %}
+$check_md5sums=1;{% endif %}
+{% if item.value.ignore_small_errors      is defined and item.value.ignore_small_errors == true   %}
+$ignore_small_errors=1;{% endif %}
+
+{% if item.value.check_gpg is defined and item.value.check_gpg == false   %}
+$check_gpg=0;{% else %}  $check_gpg=1;{% endif %}
+
+{% if item.value.pre_cleanup      is defined and item.value.pre_cleanup == true   %}
+$cleanup=1;{% endif %}
+{% if item.value.post_cleanup      is defined and item.value.post_cleanup == false   %}
+$post_cleanup=0; {% else %}  $post_cleanup=1; {% endif %}
+
+$timeout={{ item.value.timeout | default('300') }};
+
+$rsync_batch={{ item.value.rsync_batch | default('200') }};
+$rsync_options="{{ item.value.rsync_options | default('-aIL --partial') }}";
+
+
+{% if item.value.passive      is defined and item.value.passive == true   %}
+$passive=1; {% endif %}
+
+{% if item.value.proxy is defined and item.value.proxy %}
+$proxy="{{ item.value.proxy  }}";
+{% elif proxy is defined and proxy %}
+$proxy="{{ proxy }}"; {% endif %}
+$diff_mode="{{ item.value.diff_mode | default('use') }}";
+
+# The config file must return true or perl complains.
+# Always copy this.
+1;

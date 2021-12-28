@@ -1,0 +1,117 @@
+---
+# defaults file for ansible-deb-mirror
+
+debmirror_apt_keys: files/PGP_keys/*
+debmirror_keyring: trustedkeys.kbx
+
+debmirror_config_path: /etc/debmirror
+debmirror_mirror_path: /opt/mirror
+debmirror_packages: ['debmirror', 'gnupg', 'xz-utils' ]
+debmirror_nice_lvl: 19
+debmirror_clock: 0,8,16:30
+debmirror_user: apt_mirror
+debmirror_group: apt_mirror
+#debmirror_mount: volume1.mount
+
+
+debmirror_config:
+  Ubuntu:
+    progress: true
+    conf_file_name: Ubuntu.conf
+    remote_host: no.archive.ubuntu.com
+    remote_root: /ubuntu
+    i18n: true
+    do_source: false
+    max_batch: 200
+    state_cache_days: 1
+    post_cleanup: true
+    timeout: 300
+    download_method: http
+    diff_mode: use  # use|mirror|none
+    architectures:
+      - amd64
+    release:
+      - focal
+      - focal-security
+      - focal-updates
+    sections:
+      - main
+      - restricted
+      - universe
+      - multiverse
+    excludes:
+      - '/Translation-.*'
+      - '/Translation-en.gz'
+      - '/language-pack-.*'
+      - '(thunderbird|firefox)-locale-.*'
+      - '/libreoffice-l10n.*'
+      - '/manpages-(\w{2}|\w{2}-extra|\w{2}-dev|\w{2}-extra-dev)_.*'
+      - '/myspell-(\w{2}|\w{2}-\w{2,3}|)[-_].*'
+      - '/unidic-mecab.*'
+      - '/libreoffice-dev-doc.*'
+      - '/thunderbird-dbg.*'
+      - '/firefox-dbg.*'
+      - '/texlive-fonts-extra.*'
+    includes:
+      - '/myspell-(nb|nn).*'
+      - '/libreoffice-l10n-(nb|nn).*'
+      - '(thunderbird|firefox)-locale-(nb|nn).*'
+      - '/language-pack-?(gnome|kde)-(no|en).*'
+      - '/Translation-(no|en\.|en_GB|en_US).*'
+  raspbian:
+    clock: "0,8,16:00"
+    dry_run: true
+    conf_file_name: raspbian.conf
+    mirrordir: /volume1/debmirror/mirror/raspbian/
+    progress: true
+    remote_host: ftp.acc.umu.se
+    remote_root: /mirror/raspbian/raspbian
+    download_method: rsync
+    release:
+      - buster
+      - bullseye
+    sections:
+      - contrib
+      - firmware
+      - main
+      - non-free
+      - rpi
+    architectures:
+      - armhf
+    ignores:
+    excludes:
+      - '/Translation-.*'
+      - '/language-pack-.*'
+      - '(thunderbird|firefox)-locale-.*'
+      - '/libreoffice-l10n.*'
+      - '/manpages-(\w{2}|\w{2}-extra|\w{2}-dev|\w{2}-extra-dev)_.*'
+      - '/myspell-(\w{2}|\w{2}-\w{2,3}|)[-_].*'
+      - '/unidic-mecab.*'
+      - '/libreoffice-dev-doc.*'
+      - '/thunderbird-dbg.*'
+      - '/firefox-dbg.*'
+      - '/texlive-fonts-extra.*'
+    includes:
+      - '/myspell-(nb|nn).*'
+      - '/libreoffice-l10n-(nb|nn).*'
+      - '(thunderbird|firefox)-locale-(nb|nn).*'
+      - '/language-pack-?(gnome|kde)-(no|en).*'
+      - '/Translation-(no|en).*'
+    excludes_deb_section:
+      - 'games'
+      - 'news'
+      - 'science'
+      - 'xfce'
+      - 'mail'
+      - 'hamradio'
+      - 'haskell'
+      - 'education'
+      - 'devel'
+    i18n: true
+    do_source: false
+    max_batch: 200
+    state_cache_days: 1
+    post_cleanup: true
+    timeout: 300
+    diff_mode: use  # use|mirror|none
+
